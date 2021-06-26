@@ -40,6 +40,10 @@ The block types are hosted at:
   - `row: object`: Row data object.
   - `selected: object[]`: List of selected row objects.
   - `rowIndex: number`: List index of the clicked row.
+- `onRowDoubleClick`: Trigger event when a row is double clicked and pass the following to `_event`:
+  - `row: object`: Row data object.
+  - `selected: object[]`: List of selected row objects.
+  - `rowIndex: number`: List index of the clicked row.
 - `onRowSelected`: Trigger event when a row is selected and pass the following to `_event`:
   - `row: object`: Row data object.
   - `selected: object[]`: List of selected row objects.

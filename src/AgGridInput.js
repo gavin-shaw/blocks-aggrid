@@ -21,136 +21,149 @@ import { AllCommunityModules } from '@ag-grid-community/all-modules';
 import '@ag-grid-community/all-modules/dist/styles/ag-grid.css';
 
 class AgGridInput extends React.Component {
-  constructor(props) {
-    super(props);
+    constructor(props) {
+        super(props);
 
-    this.onGridReady = this.onGridReady.bind(this);
-    this.onRowClick = this.onRowClick.bind(this);
-    this.onCellClicked = this.onCellClicked.bind(this);
-    this.onRowSelected = this.onRowSelected.bind(this);
-    this.onSelectionChanged = this.onSelectionChanged.bind(this);
-    this.onRowDragEnd = this.onRowDragEnd.bind(this);
-    this.onCellValueChanged = this.onCellValueChanged.bind(this);
-  }
-
-  onGridReady(params) {
-    this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
-    this.props.methods.registerMethod('exportDataAsCsv', (args) =>
-      this.gridApi.exportDataAsCsv(args)
-    );
-  }
-
-  onRowClick(event) {
-    if (this.props.events.onRowClick) {
-      this.props.methods.triggerEvent({
-        name: 'onRowClick',
-        event: {
-          row: event.data,
-          selected: this.gridApi.getSelectedRows(),
-          rowIndex: event.rowIndex,
-        },
-      });
+        this.onGridReady = this.onGridReady.bind(this);
+        this.onRowClick = this.onRowClick.bind(this);
+        this.onRowDoubleClick = this.onRowDoubleClick.bind(this);
+        this.onCellClicked = this.onCellClicked.bind(this);
+        this.onRowSelected = this.onRowSelected.bind(this);
+        this.onSelectionChanged = this.onSelectionChanged.bind(this);
+        this.onRowDragEnd = this.onRowDragEnd.bind(this);
+        this.onCellValueChanged = this.onCellValueChanged.bind(this);
     }
-  }
 
-  onCellClicked(event) {
-    if (this.props.events.onCellClick) {
-      this.props.methods.triggerEvent({
-        name: 'onCellClick',
-        event: {
-          row: event.data,
-          cell: { column: event.colDef.field, value: event.value },
-          selected: this.gridApi.getSelectedRows(),
-          rowIndex: event.rowIndex,
-          colId: event.column.colId,
-        },
-      });
+    onGridReady(params) {
+        this.gridApi = params.api;
+        this.gridColumnApi = params.columnApi;
+        this.props.methods.registerMethod('exportDataAsCsv', (args) =>
+            this.gridApi.exportDataAsCsv(args)
+        );
     }
-  }
 
-  onRowSelected(event) {
-    if (this.props.events.onRowSelected) {
-      this.props.methods.triggerEvent({
-        name: 'onRowSelected',
-        event: { row: event.data, selected: this.gridApi.getSelectedRows() },
-        rowIndex: event.rowIndex,
-      });
+    onRowClick(event) {
+        if (this.props.events.onRowClick) {
+            this.props.methods.triggerEvent({
+                name: 'onRowClick',
+                event: {
+                    row: event.data,
+                    selected: this.gridApi.getSelectedRows(),
+                    rowIndex: event.rowIndex,
+                },
+            });
+        }
     }
-  }
 
-  onSelectionChanged() {
-    if (this.props.events.onSelectionChanged) {
-      this.props.methods.triggerEvent({
-        name: 'onSelectionChanged',
-        event: { selected: this.gridApi.getSelectedRows() },
-      });
+    onRowDoubleClick(event) {
+        if (this.props.events.onRowDoubleClick) {
+            this.props.methods.triggerEvent({
+                name: 'onRowDoubleClick',
+                event: {
+                    row: event.data,
+                    selected: this.gridApi.getSelectedRows(),
+                    rowIndex: event.rowIndex,
+                },
+            });
+        }
     }
-  }
 
-  onRowDragEnd(event) {
-    if (event.overNode !== event.node) {
-      const fromData = event.node.data;
-      const toData = event.overNode.data;
-      const fromIndex = this.props.value.indexOf(fromData);
-      const toIndex = this.props.value.indexOf(toData);
-      const newRowData = this.props.value.slice();
-      const element = newRowData[fromIndex];
-      newRowData.splice(fromIndex, 1);
-      newRowData.splice(toIndex, 0, element);
-      this.props.methods.setValue(newRowData);
-      this.gridApi.setRowData(this.props.value);
-      this.gridApi.clearFocusedCell();
-      this.props.methods.triggerEvent({
-        name: 'onRowDragEnd',
-        event: {
-          fromData,
-          toData,
-          fromIndex,
-          toIndex,
-          newRowData,
-        },
-      });
+    onCellClicked(event) {
+        if (this.props.events.onCellClick) {
+            this.props.methods.triggerEvent({
+                name: 'onCellClick',
+                event: {
+                    row: event.data,
+                    cell: { column: event.colDef.field, value: event.value },
+                    selected: this.gridApi.getSelectedRows(),
+                    rowIndex: event.rowIndex,
+                    colId: event.column.colId,
+                },
+            });
+        }
     }
-  }
 
-  onCellValueChanged(params) {
-    const newRowData = this.props.value;
-    newRowData[params.rowIndex][params.colDef.field] = params.newValue;
-    this.props.methods.setValue(newRowData);
-    this.props.methods.triggerEvent({
-      name: 'onCellValueChanged',
-      event: {
-        rowIndex: params.rowIndex,
-        rowData: params.data,
-        field: params.colDef.field,
-        newValue: params.newValue,
-        oldValue: params.oldValue,
-        newRowData,
-      },
-    });
-  }
-
-  render() {
-    const { quickFilterValue, ...someProperties } = this.props.properties;
-    if (quickFilterValue && quickFilterValue === '') {
-      this.gridApi.setQuickFilter(quickFilterValue); // check if empty string matches all
+    onRowSelected(event) {
+        if (this.props.events.onRowSelected) {
+            this.props.methods.triggerEvent({
+                name: 'onRowSelected',
+                event: { row: event.data, selected: this.gridApi.getSelectedRows() },
+                rowIndex: event.rowIndex,
+            });
+        }
     }
-    return (
-      <AgGridReact
-        onSelectionChanged={this.onSelectionChanged}
-        onRowSelected={this.onRowSelected}
-        onRowClicked={this.onRowClick}
-        onCellClicked={this.onCellClicked}
-        onGridReady={this.onGridReady}
-        onRowDragEnd={this.onRowDragEnd}
-        onCellValueChanged={this.onCellValueChanged}
-        modules={AllCommunityModules}
-        {...someProperties}
-        rowData={this.props.value}
-      />
-    );
-  }
+
+    onSelectionChanged() {
+        if (this.props.events.onSelectionChanged) {
+            this.props.methods.triggerEvent({
+                name: 'onSelectionChanged',
+                event: { selected: this.gridApi.getSelectedRows() },
+            });
+        }
+    }
+
+    onRowDragEnd(event) {
+        if (event.overNode !== event.node) {
+            const fromData = event.node.data;
+            const toData = event.overNode.data;
+            const fromIndex = this.props.value.indexOf(fromData);
+            const toIndex = this.props.value.indexOf(toData);
+            const newRowData = this.props.value.slice();
+            const element = newRowData[fromIndex];
+            newRowData.splice(fromIndex, 1);
+            newRowData.splice(toIndex, 0, element);
+            this.props.methods.setValue(newRowData);
+            this.gridApi.setRowData(this.props.value);
+            this.gridApi.clearFocusedCell();
+            this.props.methods.triggerEvent({
+                name: 'onRowDragEnd',
+                event: {
+                    fromData,
+                    toData,
+                    fromIndex,
+                    toIndex,
+                    newRowData,
+                },
+            });
+        }
+    }
+
+    onCellValueChanged(params) {
+        const newRowData = this.props.value;
+        newRowData[params.rowIndex][params.colDef.field] = params.newValue;
+        this.props.methods.setValue(newRowData);
+        this.props.methods.triggerEvent({
+            name: 'onCellValueChanged',
+            event: {
+                rowIndex: params.rowIndex,
+                rowData: params.data,
+                field: params.colDef.field,
+                newValue: params.newValue,
+                oldValue: params.oldValue,
+                newRowData,
+            },
+        });
+    }
+
+    render() {
+        const { quickFilterValue, ...someProperties } = this.props.properties;
+        if (quickFilterValue && quickFilterValue === '') {
+            this.gridApi.setQuickFilter(quickFilterValue); // check if empty string matches all
+        }
+        return ( <
+            AgGridReact onSelectionChanged = { this.onSelectionChanged }
+            onRowSelected = { this.onRowSelected }
+            onRowClicked = { this.onRowClick }
+            onRowDoubleClicked = { this.onRowDoubleClick }
+            onCellClicked = { this.onCellClicked }
+            onGridReady = { this.onGridReady }
+            onRowDragEnd = { this.onRowDragEnd }
+            onCellValueChanged = { this.onCellValueChanged }
+            modules = { AllCommunityModules } {...someProperties }
+            rowData = { this.props.value }
+            />
+        );
+    }
 }
 
 export default AgGridInput;
